@@ -9,7 +9,7 @@
 * Spring boot 2.7.5
 * Java keytool utility
 
-##(a) Create A Self Signed Cert:
+## (a) Create A Self Signed Cert:
 - We will use key tool command for this. 
 - That last part in key tool command is very critical as self signed cert created without SAN entries won’t work with Chrome and Safari.
 
