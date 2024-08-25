@@ -10,24 +10,24 @@
 * Java keytool utility
 
 ## (a) Create A Self Signed Cert:
-- We will use key tool command for this. 
-- That last part in key tool command is very critical as self signed cert created without SAN entries won’t work with Chrome and Safari.
+- key tool command for this. 
+- NOTE: That last part in key tool command is very critical as self signed cert created without SAN entries won’t work with Chrome and Safari.
 
-*Step-1: Client Side (nt-gateway)
+* Step-1: Client Side (nt-gateway)
 
 ```
 keytool -genkeypair -alias nt-gateway -keyalg RSA -keysize 2048 -storetype JKS -keystore nt-gateway.jks -validity 3650 -ext SAN=dns:localhost,ip:127.0.0.1 
 
 ```
-*Step-2: Server Cert (for nt-ms)
+* Step-2: Server Cert (for nt-ms)
 ```
 keytool -genkeypair -alias nt-ms -keyalg RSA -keysize 2048 -storetype JKS -keystore nt-ms.jks -validity 3650 -ext SAN=dns:localhost,ip:127.0.0.1
 
 ```
 
 ## (b) Create public certificate file:
-- We’ve client and server certs created, we need to set up trust between both. To do that, we’ll import client cert in to the server’s trusted certificates and vice versa. But before we can do that, we need to extract public certificate of each jks file.
-*Step-3: Client(nt-gateway) Public crt
+- The client and server certs created, now it is required to set up trust between both. To do that, import client cert in to the server’s trusted certificates and vice versa. Before that, it requirred to extract public certificate of each jks file.
+* Step-3: Client(nt-gateway) Public crt
 
 ```
 keytool -export -alias nt-gateway -file nt-gateway.crt -keystore nt-gateway.jks 
@@ -36,7 +36,7 @@ Certificate stored in file <nt-gateway.crt>
 
 ```
 
-*Step-4: Server (nt-ms) Public crt
+* Step-4: Server (nt-ms) Public crt
 ```
 keytool -export -alias nt-ms -file nt-ms.crt -keystore nt-ms.jks
 Enter keystore password:
@@ -45,20 +45,20 @@ Certificate stored in file <nt-ms.crt>
 ```
 
 ## (c) Import Cert to jks File:
-*Step-5: Client Cert to Server side (hit: use server jks password: here nt-service)
+* Step-5: Client Cert to Server side (hint: use server jks password: here nt-service)
 ```
 keytool -import -alias nt-gateway -file nt-gateway.crt -keystore nt-ms.jks
 
 ```
-*Step-6: Server Cert to Client side 
+* Step-6: Server Cert to Client side 
 ```
 keytool -import -alias nt-ms -file nt-ms.crt -keystore nt-gateway.jks
 
 ```
 
 ## (d) Configure Server (nt-service) 2 Way SSL: 
-*Step-7: Copy final server jks file (eg, nt-ms.jks) to the src/main/resources/ folder of nt-ms application.
-*Step-8: Add following in application.yml
+* Step-7: Copy final server jks file (eg, nt-ms.jks) to the src/main/resources/ folder of nt-ms application.
+* Step-8: Add following in application.yml
 
 
 ```
@@ -83,8 +83,8 @@ server:
 
 
 ## (e) Configure Client (nt-gateway) for 2 way SSL:
-*Step-9: Copy final server jks file (eg, nt-gateway.jks) to the src/main/resources/ folder of nt-ms application.
-*Step-10: Add following in application.yml
+* Step-9: Copy final server jks file (eg, nt-gateway.jks) to the src/main/resources/ folder of nt-ms application.
+* Step-10: Add following in application.yml
 
 ```
 spring:
@@ -115,7 +115,7 @@ endpoint:
 - When we access gateway url in browser, our browser becomes the client to our gateway application and so, our gateway web app will ask the browser to present a cert for authentication.
 - NOTE: But our browser can’t understand a .jks file. Instead, it understands PKCS12 format. So, how do we convert .jks file to PKCS12 format.
 
-*Step-11: jks (nt-ms.jks) file to PKCS12
+* Step-11: jks (nt-ms.jks) file to PKCS12
 ```
 keytool -importkeystore -srckeystore nt-ms.jks -destkeystore nt-ms.p12 -srcstoretype JKS -deststoretype PKCS12 -srcstorepass nt-service -deststorepass nt-service -srcalias nt-ms -destalias nt-ms -srckeypass nt-service -destkeypass nt-service -noprompt
 
